@@ -134,33 +134,15 @@ export default function EditCoursePage() {
                 />
               </div>
 
-              {/* Course Type */}
-              <div className="relative">
-                <Label htmlFor="courseType">Course Type</Label>
-                <Select
-                  value={courseDetails.courseType}
-                  onValueChange={(value) => setCourseDetails({ ...courseDetails, courseType: value })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select course type" />
-                  </SelectTrigger>
-                  <SelectPortal>
-                    <SelectContent className="z-50 bg-white shadow-lg rounded-md p-2">
-                      <SelectItem value="L">Regular</SelectItem>
-                      <SelectItem value="P">Professional Elective</SelectItem>
-                    </SelectContent>
-                  </SelectPortal>
-                </Select>
-              </div>
-
-              {/* Updated By (Admin ID) */}
+              {/* Maximum Enrollments */}
               <div>
-                <Label htmlFor="updatedBy">Updated By (Admin ID)</Label>
+                <Label htmlFor="maxEnrollments">Maximum Enrollments</Label>
                 <Input
-                  id="updatedBy"
+                  id="maxEnrollments"
                   type="number"
-                  value={courseDetails.updatedBy}
-                  onChange={(e) => setCourseDetails({ ...courseDetails, updatedBy: e.target.value })}
+                  min="1"
+                  value={courseDetails.maxEnrollments}
+                  onChange={(e) => setCourseDetails({ ...courseDetails, maxEnrollments: e.target.value })}
                   required
                 />
               </div>

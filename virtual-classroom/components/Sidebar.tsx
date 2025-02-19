@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, PlusCircle, Pencil, User, ChevronLeft, ChevronRight, View, Book, UserCheck, UserPlus } from "lucide-react";
+import { Home, PlusCircle, Pencil, User, ChevronLeft, ChevronRight, Book, UserPlus, UserPenIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   return (
-    <aside className={`h-screen bg-white dark:bg-gray-800 shadow-md transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"} relative`}>
+    <aside className={`bg-white dark:bg-gray-800 shadow-md transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"} relative flex flex-col min-h-screen`}>
+      
       {/* Sidebar Toggle Button */}
       <Button 
         onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
@@ -19,12 +20,13 @@ export default function Sidebar() {
         {isSidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
       </Button>
 
-      <nav className="p-4 space-y-4 mt-10">
+      {/* Sidebar Navigation */}
+      <nav className="p-4 space-y-4 mt-10 flex-grow">
         <Link href="/" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
           <Home className="w-5 h-5 mr-3" /> {isSidebarOpen && "Home"}
         </Link>
         <Link href="/create-course" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
-          <PlusCircle className="w-5 h-5 mr-3" /> {isSidebarOpen && "Create New Course"}
+          <PlusCircle className="w-5 h-5 mr-3" /> {isSidebarOpen && "Create Course"}
         </Link>
         <Link href="/edit-course" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
           <Pencil className="w-5 h-5 mr-3" /> {isSidebarOpen && "Edit Course"}
@@ -35,14 +37,18 @@ export default function Sidebar() {
         <Link href="/assign-faculty" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
           <UserPlus className="w-5 h-5 mr-3" /> {isSidebarOpen && "Assign Faculty"}
         </Link>
+        <Link href="/enroll-students" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+          <UserPenIcon className="w-5 h-5 mr-3" /> {isSidebarOpen && "Enroll Students"}
+        </Link>
       </nav>
 
       {/* Account Details at Bottom */}
-      <div className="absolute bottom-4 w-full p-4">
+      <div className="p-4 border-t border-gray-300 dark:border-gray-700">
         <Link href="/admin/account" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
           <User className="w-5 h-5 mr-3" /> {isSidebarOpen && "Account Details"}
         </Link>
       </div>
+      
     </aside>
   );
 }
