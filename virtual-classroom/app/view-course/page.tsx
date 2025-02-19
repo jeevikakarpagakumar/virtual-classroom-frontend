@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowLeft } from "lucide-react";
 
 interface Course {
   id: number;
@@ -14,6 +15,7 @@ interface Course {
 }
 
 export default function ViewCourses() {
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [sortOption, setSortOption] = useState<string>("A-Z");
 
@@ -43,19 +45,28 @@ export default function ViewCourses() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Available Courses</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              Filter <ChevronDown size={16} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => sortCourses("A-Z")}>Sort A-Z</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => sortCourses("Z-A")}>Sort Z-A</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => sortCourses("Oldest")}>Sort by Oldest</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => sortCourses("Newest")}>Sort by Newest</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        
+        <div className="flex gap-3">
+          {/* Back Button */}
+          <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2">
+            <ArrowLeft size={16} /> Back
+          </Button>
+
+          {/* Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                Filter <ChevronDown size={16} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => sortCourses("A-Z")}>Sort A-Z</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => sortCourses("Z-A")}>Sort Z-A</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => sortCourses("Oldest")}>Sort by Oldest</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => sortCourses("Newest")}>Sort by Newest</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

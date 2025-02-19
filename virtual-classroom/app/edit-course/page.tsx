@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Toast } from "@/components/ui/toast";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { SelectPortal } from "@radix-ui/react-select";
-import Sidebar from "@/components/Sidebar";
+import { ArrowLeft } from "lucide-react";
 
 export default function EditCoursePage() {
   const router = useRouter();
@@ -66,12 +66,14 @@ export default function EditCoursePage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+      {/* Back Button */}
+      <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2 mb-6 w-fit ml-auto">
+        <ArrowLeft size={16} /> Back
+      </Button>
 
       {/* Main Content */}
-      <div className="flex-1 flex justify-center items-center p-6">
+      <div className="flex justify-center items-center">
         <Card className="w-full max-w-lg p-6 shadow-lg border rounded-lg bg-white dark:bg-gray-800">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
             Edit Course

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, PlusCircle, Pencil, User, ChevronLeft, ChevronRight, View, Book } from "lucide-react";
+import { Home, PlusCircle, Pencil, User, ChevronLeft, ChevronRight, View, Book, UserCheck, UserPlus } from "lucide-react";
 import Link from "next/link";
 
 export default function Sidebar() {
@@ -31,6 +31,9 @@ export default function Sidebar() {
         </Link>
         <Link href="/view-course" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
           <Book className="w-5 h-5 mr-3" /> {isSidebarOpen && "View Course"}
+        </Link>
+        <Link href="/assign-faculty" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+          <UserPlus className="w-5 h-5 mr-3" /> {isSidebarOpen && "Assign Faculty"}
         </Link>
       </nav>
 

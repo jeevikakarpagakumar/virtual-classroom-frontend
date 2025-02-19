@@ -51,11 +51,12 @@ export default function CreateCoursePage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar (Fixed on the left) */}
-      <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex justify-center items-center p-6">
+      <div className="flex-1 flex justify-center items-center p-6 relative">
+        <Button type="button" onClick={() => router.back()} className="absolute top-4 right-4">
+            Back
+        </Button>
         <Card className="w-full max-w-lg p-6 shadow-lg border rounded-lg bg-white dark:bg-gray-800">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
             Create a New Course
