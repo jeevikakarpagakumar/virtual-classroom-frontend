@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { SelectPortal } from "@radix-ui/react-select";
 import { ArrowLeft } from "lucide-react";
+import Sidebar from "@/components/Sidebar";
 
 export default function AssignFacultyPage() {
   const router = useRouter();

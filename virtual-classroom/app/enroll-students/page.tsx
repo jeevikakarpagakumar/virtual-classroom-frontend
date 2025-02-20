@@ -17,6 +17,8 @@ export default function EnrollStudentsPage() {
   const [selectedCourseID, setSelectedCourseID] = useState("");
   const [studentID, setStudentID] = useState("");
   const [studentName, setStudentName] = useState("");
+  const [semester, setSemester] = useState("");
+  const [section, setSection] = useState("");
   const [toastMessage, setToastMessage] = useState("");
 
   // Fetch courses with their enrollment limits
@@ -33,7 +35,7 @@ export default function EnrollStudentsPage() {
 
   // Handle enrollment
   const handleEnroll = async () => {
-    if (!selectedCourseID || !studentID || !studentName) {
+    if (!selectedCourseID || !studentID || !studentName || !semester || !section) {
       setToastMessage("Please fill all fields before enrolling.");
       return;
     }
@@ -47,7 +49,7 @@ export default function EnrollStudentsPage() {
     const response = await fetch("/api/enroll-student", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ courseID: selectedCourseID, studentID, studentName }),
+      body: JSON.stringify({ courseID: selectedCourseID, studentID, studentName, semester, section }),
     });
 
     if (response.ok) {
@@ -59,6 +61,8 @@ export default function EnrollStudentsPage() {
       );
       setStudentID("");
       setStudentName("");
+      setSemester("");
+      setSection("");
     } else {
       setToastMessage("Failed to enroll student. Please try again.");
     }
@@ -79,7 +83,7 @@ export default function EnrollStudentsPage() {
           </h2>
 
           {/* Course Selection */}
-          <div className="mb-6">
+          <div className="mb-4">
             <Label>Select Course</Label>
             <Select value={selectedCourseID} onValueChange={setSelectedCourseID}>
               <SelectTrigger className="w-full">
@@ -107,6 +111,44 @@ export default function EnrollStudentsPage() {
               <Label htmlFor="studentName">Student Name</Label>
               <Input id="studentName" value={studentName} onChange={(e) => setStudentName(e.target.value)} required />
             </div>
+          </div>
+
+          {/* Semester Selection */}
+          <div className="mt-4">
+            <Label>Select Semester</Label>
+            <Select value={semester} onValueChange={setSemester}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choose a semester" />
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectContent className="z-50 bg-white shadow-lg rounded-md p-2">
+                  {["I", "II", "III", "IV", "V", "VI", "VII", "VIII"].map((sem) => (
+                    <SelectItem key={sem} value={sem}>
+                      Semester {sem}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </SelectPortal>
+            </Select>
+          </div>
+
+          {/* Section Selection */}
+          <div className="mt-4">
+            <Label>Select Section</Label>
+            <Select value={section} onValueChange={setSection}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choose a section" />
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectContent className="z-50 bg-white shadow-lg rounded-md p-2">
+                  {["A", "B", "C", "D", "E", "F", "G", "H"].map((sec) => (
+                    <SelectItem key={sec} value={sec}>
+                      Section {sec}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </SelectPortal>
+            </Select>
           </div>
 
           {/* Enroll Button */}
