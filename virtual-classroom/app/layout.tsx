@@ -10,7 +10,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <footer className="footer">
           <p>© 2025 Virtual Classroom, All rights reserved</p>
-          <p>Under Development</p>
+          <p>Under development</p>
         </footer>
       </body>
     </html>

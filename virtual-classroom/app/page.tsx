@@ -31,6 +31,12 @@ export default function Home() {
           <Link href="/admin" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
             <UserCog className="w-5 h-5 mr-3" /> {isSidebarOpen && "Admin"}
           </Link>
+          <Link href="/student" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+            <UserCog className="w-5 h-5 mr-3" /> {isSidebarOpen && "student"}
+          </Link>
+          <Link href="/teacher" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+            <UserCog className="w-5 h-5 mr-3" /> {isSidebarOpen && "teacher"}
+          </Link>
         </nav>
       </aside>
 
