@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, PlusCircle, Pencil, User, ChevronLeft, ChevronRight, Book, UserPlus, UserPenIcon } from "lucide-react";
+import { Home, PlusCircle, Pencil, User, ChevronLeft, ChevronRight, Book, UserPlus, UserPenIcon, Bell } from "lucide-react";
 import Link from "next/link";
 
 export default function Sidebar() {
@@ -22,7 +22,7 @@ export default function Sidebar() {
 
       {/* Sidebar Navigation */}
       <nav className="p-4 space-y-4 mt-10 flex-grow">
-        <Link href="/" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+        <Link href="/admin" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
           <Home className="w-5 h-5 mr-3" /> {isSidebarOpen && "Home"}
         </Link>
         <Link href="/create-course" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -39,6 +39,9 @@ export default function Sidebar() {
         </Link>
         <Link href="/enroll-students" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
           <UserPenIcon className="w-5 h-5 mr-3" /> {isSidebarOpen && "Enroll Students"}
+        </Link>
+        <Link href="/" className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+          <Bell className="w-5 h-5 mr-3" /> {isSidebarOpen && "Announcements"}
         </Link>
       </nav>
 

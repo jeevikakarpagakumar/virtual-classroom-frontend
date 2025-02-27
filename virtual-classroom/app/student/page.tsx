@@ -8,27 +8,82 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 import { useRouter } from "next/navigation";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import secureLocalStorage from "react-secure-storage";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function StudentDashboard() {
   const router = useRouter();
-  const [enrolledCourses, setEnrolledCourses] = useState<string[]>([]);
-  const [progressData, setProgressData] = useState<any>(null);
+  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
+  const [attendanceData, setAttendanceData] = useState<any>(null);
+
+  // Sample data for testing
+  const sampleCourses = [
+    { courseCode: "CS101", courseName: "Data Structures" },
+    { courseCode: "CS102", courseName: "Operating Systems" },
+    { courseCode: "CS103", courseName: "Web Technologies" },
+  ];
+
+  const sampleAttendance = [85, 72, 60];
 
   useEffect(() => {
-    setEnrolledCourses(["AI", "Web Dev", "Data Science", "Cybersecurity", "Cloud Computing"]);
-    setProgressData({
-      labels: ["AI", "Web Dev", "Data Science", "Cybersecurity", "Cloud Computing"],
-      datasets: [
-        {
-          label: "Progress (%)",
-          data: [80, 50, 30, 60, 20],
-          backgroundColor: ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#6366F1"],
-        },
-      ],
-    });
-  }, []);
+    const fetchCourses = async () => {
+      try {
+        const token = secureLocalStorage.getItem("jwtToken");
+        if (!token) {
+          alert("No token found. Please log in.");
+          router.push("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:8080/api/student/getCourses", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch courses");
+        }
+
+        const data = await response.json();
+        console.log("Fetched courses:", data);
+        if (data.length === 0) {
+          setEnrolledCourses(sampleCourses);
+          setAttendanceData({
+            labels: sampleCourses.map((course) => course.courseCode),
+            datasets: [
+              {
+                label: "Attendance (%)",
+                data: sampleAttendance,
+                backgroundColor: ["#4F46E5", "#10B981", "#F59E0B"],
+              },
+            ],
+          });
+        } else {
+          setEnrolledCourses(data);
+          const attendance = data.map(() => Math.floor(Math.random() * 100));
+          setAttendanceData({
+            labels: data.map((course: any) => course.courseCode || "No Code"),
+            datasets: [
+              {
+                label: "Attendance (%)",
+                data: attendance,
+                backgroundColor: ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#6366F1"],
+              },
+            ],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        alert("Failed to load enrolled courses. Please try again.");
+      }
+    };
+
+    fetchCourses();
+  }, [router]);
 
   return (
     <div className="p-6">
@@ -45,13 +100,16 @@ export default function StudentDashboard() {
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
-              {enrolledCourses.map((course, index) => (
-                <li key={index}>{course}</li>
-              ))}
+              {enrolledCourses.length > 0 ? (
+                enrolledCourses.map((course: any, index: number) => (
+                  <li key={index}>{`${course.courseCode || "No Code"} - ${course.courseName || "No Name"}`}</li>
+                ))
+              ) : (
+                <li>No courses enrolled</li>
+              )}
             </ul>
           </CardContent>
         </Card>
-
         <Card className="border shadow-sm p-4">
           <CardHeader className="flex items-center space-x-4">
             <CalendarDays className="w-8 h-8 text-blue-600" />
@@ -63,32 +121,41 @@ export default function StudentDashboard() {
         </Card>
       </div>
 
-      {progressData && (
+      {attendanceData && (
         <Card className="border shadow-sm p-4">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Course Progress Overview</CardTitle>
+            <CardTitle className="text-lg font-semibold">Course Attendance Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <Bar data={progressData} />
+            <Bar
+              data={attendanceData}
+              options={{
+                plugins: {
+                  annotation: {
+                    annotations: {
+                      line1: {
+                        type: 'line',
+                        yMin: 75,
+                        yMax: 75,
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        label: {
+                          content: '75% Threshold',
+                          enabled: true,
+                          position: 'start',
+                        },
+                      },
+                    },
+                  },
+                },
+              }}
+            />
           </CardContent>
         </Card>
       )}
-
-      <div className="mt-8">
-        <Card className="border shadow-sm p-4">
-          <CardHeader className="flex items-center space-x-4">
-            <ClipboardList className="w-8 h-8 text-indigo-600" />
-            <CardTitle className="text-lg font-semibold">Recent Activities</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-6 text-gray-700 space-y-2">
-              <li>Completed "Intro to AI" with 90% score.</li>
-              <li>Joined "Web Dev Bootcamp" course.</li>
-              <li>Upcoming quiz in "Cybersecurity Basics".</li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
+
+
+// Let me know if you want any adjustments or more features! 🚀

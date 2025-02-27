@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { ArrowLeft } from "lucide-react";
 
 export default function CreateQuizPage() {
   const router = useRouter();
@@ -43,6 +44,13 @@ export default function CreateQuizPage() {
 
   return (
     <div className="p-6">
+        {/* Back Button */}
+      <Button
+        variant="outline"
+        onClick={() => router.back()}
+        className="flex items-center gap-2 mb-6 w-fit ml-auto">
+        <ArrowLeft size={16} /> Back
+      </Button>
       <h2 className="text-3xl font-bold mb-6">Create a New Quiz</h2>
       <Card className="border shadow-sm p-6">
         <CardHeader>
