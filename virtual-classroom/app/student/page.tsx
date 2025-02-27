@@ -6,7 +6,6 @@ import { BookOpen, ClipboardList, CalendarDays } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 
