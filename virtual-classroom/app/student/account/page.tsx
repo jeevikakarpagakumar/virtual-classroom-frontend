@@ -3,8 +3,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Mail, Calendar, Phone, ArrowLeft } from "lucide-react";
+<<<<<<< HEAD
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+=======
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { getStudentProfile } from "@/app/_utils/api";
+>>>>>>> 3264ec7a252cb58a9ba6b58c3b3a75035c659dc1
 import secureLocalStorage from "react-secure-storage";
 
 interface UserInfo {
@@ -59,6 +66,31 @@ export default function AccountPage() {
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    const jwtToken = secureLocalStorage.getItem("jwtToken");
+    console.log("jwtToken in Profile", jwtToken);
+
+    if (jwtToken === null) {
+      router.push("/login");
+      return;
+    }
+
+    const fetchUserInfo = async () => {
+      try {
+        const response = await getStudentProfile(jwtToken);
+        if (response.success) {
+          setUserInfo(response.data);
+        } else {
+          console.error("Failed to fetch user info:", response.message);
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [router]);
 
   return (
     <div className="p-6">
