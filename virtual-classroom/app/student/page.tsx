@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, ClipboardList, CalendarDays } from "lucide-react";
+import { BookOpen, CalendarDays } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { useRouter } from "next/navigation";
@@ -40,7 +40,7 @@ export default function StudentDashboard() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": token,
+            "Authorization": token as string,
           },
         });
 
@@ -69,7 +69,7 @@ export default function StudentDashboard() {
             labels: data.map((course: any) => course.courseCode || "No Code"),
             datasets: [
               {
-                label: "Attendance (%)",
+                label: "Attendance (%) is less than 75%",
                 data: attendance,
                 backgroundColor: ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#6366F1"],
               },
@@ -127,35 +127,40 @@ export default function StudentDashboard() {
             <CardTitle className="text-lg font-semibold">Course Attendance Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <Bar
-              data={attendanceData}
-              options={{
-                plugins: {
-                  annotation: {
-                    annotations: {
-                      line1: {
-                        type: 'line',
-                        yMin: 75,
-                        yMax: 75,
-                        borderColor: 'red',
-                        borderWidth: 2,
-                        label: {
-                          content: '75% Threshold',
-                          enabled: true,
-                          position: 'start',
-                        },
-                      },
-                    },
-                  },
-                },
-              }}
-            />
+          <Bar
+  data={{
+    labels: attendanceData.labels,
+    datasets: attendanceData.datasets.map((dataset: { data: any[]; }) => ({
+      ...dataset,
+      backgroundColor: dataset.data.map((value) => (value < 75 ? 'red' : 'green')),
+    })),
+  }}
+  options={{
+    plugins: {},
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Course Code',
+          font: { size: 16, weight: 'bold' },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Attendance Percentage',
+          font: { size: 16, weight: 'bold' },
+        },
+        min: 0,
+        max: 100,
+      },
+    },
+  }}
+/>
+
           </CardContent>
         </Card>
       )}
     </div>
   );
 }
-
-
-// Let me know if you want any adjustments or more features! 🚀

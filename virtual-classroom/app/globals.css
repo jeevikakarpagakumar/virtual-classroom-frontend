@@ -8,6 +8,15 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
 }
+/* Root Layout Styling */
+.body-container {
+  @apply bg-gray-100 min-h-screen flex flex-col;
+}
+
+/* Main Content Styling */
+main {
+  @apply flex-1;
+}
 
 .dark body {
   background-color: theme("colors.dark-background"); /* Dark Mode */
