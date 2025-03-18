@@ -3,15 +3,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Mail, Calendar, Phone, ArrowLeft } from "lucide-react";
-<<<<<<< HEAD
 import { Button } from "@/components/ui/button";
-import axios from "axios";
-=======
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { getStudentProfile } from "@/app/_utils/api";
->>>>>>> 3264ec7a252cb58a9ba6b58c3b3a75035c659dc1
 import secureLocalStorage from "react-secure-storage";
 
 interface UserInfo {
@@ -32,31 +25,28 @@ export default function AccountPage() {
 
   const fetchProfile = async () => {
     try {
-      const token = secureLocalStorage.getItem("jwtToken"); // Assuming token is stored here
+      const token = secureLocalStorage.getItem("jwtToken") as string;
       if (!token) throw new Error("No token found");
 
-      const response = await axios.get("http://localhost:8080/api/student/getStudentProfile", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": token as string,
-        },
-        params: {
-          emailID: "bharathshan@outlook.com", // Replace with dynamic email if needed
-        },
-      });
+      const response = await getStudentProfile(token);
 
-      const profile = response.data;
-      setUserInfo({
-        name: profile.StudentName,
-        email: profile.EmailID,
-        age: new Date().getFullYear() - parseInt(profile.StartYear), // Calculate age
-        deptName: profile.DeptName,
-        sectionName: profile.SectionName,
-        semesterNumber: profile.SemesterNumber,
-        dob: profile.DOB || "N/A", // Add DOB field if available
-        phone: profile.Phone || "N/A",
-      });
+      if (response.success) {
+        const profile = response.data;
+        console.log("Profile data:", profile);
+
+        setUserInfo({
+          name: profile.studentName,
+          email: profile.emailID,
+          age: new Date().getFullYear() - parseInt(profile.startYear),
+          deptName: profile.deptName || "N/A",
+          sectionName: profile.sectionName || "N/A",
+          semesterNumber: profile.semesterNumber || "N/A",
+          dob: profile.dob || "N/A",
+          phone: profile.phone || "N/A",
+        });
+      } else {
+        setError(response.message);
+      }
     } catch (err) {
       setError("Failed to fetch profile");
       console.error(err);
@@ -67,42 +57,19 @@ export default function AccountPage() {
     fetchProfile();
   }, []);
 
-  useEffect(() => {
-    const jwtToken = secureLocalStorage.getItem("jwtToken");
-    console.log("jwtToken in Profile", jwtToken);
-
-    if (jwtToken === null) {
-      router.push("/login");
-      return;
-    }
-
-    const fetchUserInfo = async () => {
-      try {
-        const response = await getStudentProfile(jwtToken);
-        if (response.success) {
-          setUserInfo(response.data);
-        } else {
-          console.error("Failed to fetch user info:", response.message);
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, [router]);
-
   return (
     <div className="p-6">
       <Button
         variant="outline"
         onClick={() => router.back()}
-        className="flex items-center gap-2 mb-6 w-fit ml-auto">
+        className="flex items-center gap-2 mb-6 w-fit ml-auto"
+      >
         <ArrowLeft size={16} /> Back
       </Button>
 
       <h2 className="text-3xl font-bold mb-6">Account Information</h2>
       {error && <p className="text-red-500">{error}</p>}
+
       {userInfo ? (
         <Card className="border shadow-sm p-4">
           <CardHeader>
@@ -111,34 +78,57 @@ export default function AccountPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-gray-500" />
-              <p className="text-gray-800">{userInfo.name}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-gray-500" />
-              <p className="text-gray-800">{userInfo.email}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-gray-500" />
-              <p className="text-gray-800">{userInfo.dob}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-gray-500" />
-              <p className="text-gray-800">{userInfo.phone}</p>
-            </div>
+            {/* ✅ Name */}
+            {userInfo.name && (
+              <div className="flex items-center gap-3">
+                <User className="w-5 h-5 text-gray-500" />
+                <p className="text-gray-800">{userInfo.name}</p>
+              </div>
+            )}
+
+            {/* ✅ Email */}
+            {userInfo.email && (
+              <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-gray-500" />
+                <p className="text-gray-800">{userInfo.email}</p>
+              </div>
+            )}
+
+            {/* ✅ Date of Birth */}
+            {userInfo.dob !== "N/A" && (
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-gray-500" />
+                <p className="text-gray-800">{userInfo.dob}</p>
+              </div>
+            )}
+
+            {/* ✅ Phone */}
+            {userInfo.phone !== "N/A" && (
+              <div className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-gray-500" />
+                <p className="text-gray-800">{userInfo.phone}</p>
+              </div>
+            )}
+
+            {/* ✅ Age */}
             <div className="flex items-center gap-3">
               <p className="font-semibold">Age:</p>
               <p className="text-gray-800">{userInfo.age}</p>
             </div>
+
+            {/* ✅ Department */}
             <div className="flex items-center gap-3">
               <p className="font-semibold">Department:</p>
               <p className="text-gray-800">{userInfo.deptName}</p>
             </div>
+
+            {/* ✅ Section */}
             <div className="flex items-center gap-3">
               <p className="font-semibold">Section:</p>
               <p className="text-gray-800">{userInfo.sectionName}</p>
             </div>
+
+            {/* ✅ Semester */}
             <div className="flex items-center gap-3">
               <p className="font-semibold">Semester:</p>
               <p className="text-gray-800">{userInfo.semesterNumber}</p>

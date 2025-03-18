@@ -67,12 +67,6 @@ export const makeRequest = async (url, method, body = null, token = null) => {
   }
 };
 
-export const getStudentProfile = async (token) => {
-  const response = await makeRequest("/student/profile", "GET", null, token);
-  console.log(response);
-  return response;
-};
-
 export const registerCourse = async (courseData, token) => {
   const response = await makeRequest(
     "/admin/register-course",
@@ -82,4 +76,12 @@ export const registerCourse = async (courseData, token) => {
   );
 
   return response;
+};
+
+export const getStudentProfile = async (token) => {
+  return makeRequest("/student/profile", "GET", null, token);
+};
+
+export const getStudentCourses = async (emailID, token) => {
+  return makeRequest("/student/getCourses", "GET", { emailID }, token);
 };
