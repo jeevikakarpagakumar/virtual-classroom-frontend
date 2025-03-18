@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ChevronDown, ArrowLeft, ChevronUp, ChevronRight } from "lucide-react";
 import secureLocalStorage from "react-secure-storage";
 
@@ -34,13 +39,16 @@ export default function ViewCourses() {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/api/student/getCourses", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": token,
-          },
-        });
+        const response = await fetch(
+          "http://localhost:8080/api/student/getCourses",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch courses");
@@ -58,7 +66,7 @@ export default function ViewCourses() {
   }, [router]);
 
   const sortCourses = (option: string) => {
-    let sortedCourses = [...courses];
+    const sortedCourses = [...courses];
     if (option === "A-Z") {
       sortedCourses.sort((a, b) => a.courseName.localeCompare(b.courseName));
     } else if (option === "Z-A") {
@@ -75,10 +83,16 @@ export default function ViewCourses() {
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Available Courses</h1>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+          Available Courses
+        </h1>
 
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            className="flex items-center gap-2"
+          >
             <ArrowLeft size={16} /> Back
           </Button>
 
@@ -89,8 +103,12 @@ export default function ViewCourses() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => sortCourses("A-Z")}>Sort A-Z</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => sortCourses("Z-A")}>Sort Z-A</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => sortCourses("A-Z")}>
+                Sort A-Z
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => sortCourses("Z-A")}>
+                Sort Z-A
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -106,17 +124,30 @@ export default function ViewCourses() {
                     <h2 className="text-xl font-semibold">
                       {course.courseName} - {course.courseCode}
                     </h2>
-                    <p className="text-gray-600">Faculty: {course.facultyName}</p>
+                    <p className="text-gray-600">
+                      Faculty: {course.facultyName}
+                    </p>
                   </div>
-                  <Button variant="ghost" onClick={() => toggleExpand(course.courseID)}>
-                    {expandedCourse === course.courseID ? <ChevronUp size={20} /> : <ChevronRight size={20} />}
+                  <Button
+                    variant="ghost"
+                    onClick={() => toggleExpand(course.courseID)}
+                  >
+                    {expandedCourse === course.courseID ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronRight size={20} />
+                    )}
                   </Button>
                 </div>
 
                 {expandedCourse === course.courseID && (
                   <div className="mt-4 p-3 border-t border-gray-300">
-                    <h3 className="text-lg font-semibold mb-2">Course Description</h3>
-                    <p className="text-gray-700">{course.courseDescription || "No description available."}</p>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Course Description
+                    </h3>
+                    <p className="text-gray-700">
+                      {course.courseDescription || "No description available."}
+                    </p>
                   </div>
                 )}
               </CardContent>
