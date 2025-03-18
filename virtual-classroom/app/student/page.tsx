@@ -4,13 +4,28 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, CalendarDays } from "lucide-react";
 import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { useRouter } from "next/navigation";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import secureLocalStorage from "react-secure-storage";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function StudentDashboard() {
   const router = useRouter();
@@ -36,13 +51,16 @@ export default function StudentDashboard() {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/api/student/getCourses", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": token as string,
-          },
-        });
+        const response = await fetch(
+          "http://localhost:8080/api/student/getCourses",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch courses");
@@ -71,7 +89,13 @@ export default function StudentDashboard() {
               {
                 label: "Attendance (%) is less than 75%",
                 data: attendance,
-                backgroundColor: ["#4F46E5", "#10B981", "#F59E0B", "#EF4444", "#6366F1"],
+                backgroundColor: [
+                  "#4F46E5",
+                  "#10B981",
+                  "#F59E0B",
+                  "#EF4444",
+                  "#6366F1",
+                ],
               },
             ],
           });
@@ -89,20 +113,26 @@ export default function StudentDashboard() {
     <div className="p-6">
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-gray-800">Student Dashboard</h2>
-        <p className="text-lg text-gray-600 mt-1">Track your course progress and achievements.</p>
+        <p className="text-lg text-gray-600 mt-1">
+          Track your course progress and achievements.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <Card className="border shadow-sm p-4">
           <CardHeader className="flex items-center space-x-4">
             <BookOpen className="w-8 h-8 text-green-600" />
-            <CardTitle className="text-lg font-semibold">Enrolled Courses</CardTitle>
+            <CardTitle className="text-lg font-semibold">
+              Enrolled Courses
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               {enrolledCourses.length > 0 ? (
                 enrolledCourses.map((course: any, index: number) => (
-                  <li key={index}>{`${course.courseCode || "No Code"} - ${course.courseName || "No Name"}`}</li>
+                  <li key={index}>{`${course.courseCode || "No Code"} - ${
+                    course.courseName || "No Name"
+                  }`}</li>
                 ))
               ) : (
                 <li>No courses enrolled</li>
@@ -116,7 +146,10 @@ export default function StudentDashboard() {
             <CardTitle className="text-lg font-semibold">Calendar</CardTitle>
           </CardHeader>
           <CardContent>
-            <FullCalendar plugins={[dayGridPlugin]} initialView="dayGridMonth" />
+            <FullCalendar
+              plugins={[dayGridPlugin]}
+              initialView="dayGridMonth"
+            />
           </CardContent>
         </Card>
       </div>
@@ -124,40 +157,45 @@ export default function StudentDashboard() {
       {attendanceData && (
         <Card className="border shadow-sm p-4">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Course Attendance Overview</CardTitle>
+            <CardTitle className="text-lg font-semibold">
+              Course Attendance Overview
+            </CardTitle>
           </CardHeader>
           <CardContent>
-          <Bar
-  data={{
-    labels: attendanceData.labels,
-    datasets: attendanceData.datasets.map((dataset: { data: any[]; }) => ({
-      ...dataset,
-      backgroundColor: dataset.data.map((value) => (value < 75 ? 'red' : 'green')),
-    })),
-  }}
-  options={{
-    plugins: {},
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Course Code',
-          font: { size: 16, weight: 'bold' },
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Attendance Percentage',
-          font: { size: 16, weight: 'bold' },
-        },
-        min: 0,
-        max: 100,
-      },
-    },
-  }}
-/>
-
+            <Bar
+              data={{
+                labels: attendanceData.labels,
+                datasets: attendanceData.datasets.map(
+                  (dataset: { data: any[] }) => ({
+                    ...dataset,
+                    backgroundColor: dataset.data.map((value) =>
+                      value < 75 ? "red" : "green"
+                    ),
+                  })
+                ),
+              }}
+              options={{
+                plugins: {},
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: "Course Code",
+                      font: { size: 16, weight: "bold" },
+                    },
+                  },
+                  y: {
+                    title: {
+                      display: true,
+                      text: "Attendance Percentage",
+                      font: { size: 16, weight: "bold" },
+                    },
+                    min: 0,
+                    max: 100,
+                  },
+                },
+              }}
+            />
           </CardContent>
         </Card>
       )}

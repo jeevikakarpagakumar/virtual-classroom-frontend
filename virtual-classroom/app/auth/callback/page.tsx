@@ -29,7 +29,7 @@ export default function AuthCallback() {
         if (userRole === "Student") {
           URL = BASE_URL + "/studentAuth";
         } else if (userRole === "Admin") {
-          URL = BASE_URL + "/adminAuth";
+          URL = BASE_URL + "/Aauth";
         } else {
           URL = BASE_URL + "/studentAuth"; // need to change to faculty
         }
