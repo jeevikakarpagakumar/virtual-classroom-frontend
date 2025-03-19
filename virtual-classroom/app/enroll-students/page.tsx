@@ -7,13 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Toast } from "@/components/ui/toast";
-import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+import {
+  Select,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+} from "@/components/ui/select";
 import { SelectPortal } from "@radix-ui/react-select";
 import { ArrowLeft, UserPlus } from "lucide-react";
+import { getCourses, enrollStudent } from "@/app/_utils/api";
 
 export default function EnrollStudentsPage() {
   const router = useRouter();
-  const [courses, setCourses] = useState<{ id: string; name: string; maxEnrollments: number; enrolled: number }[]>([]);
+  const [courses, setCourses] = useState<
+    { id: string; name: string; maxEnrollments: number; enrolled: number }[]
+  >([]);
   const [selectedCourseID, setSelectedCourseID] = useState("");
   const [studentID, setStudentID] = useState("");
   const [studentName, setStudentName] = useState("");
@@ -24,45 +33,54 @@ export default function EnrollStudentsPage() {
   // Fetch courses with their enrollment limits
   useEffect(() => {
     const fetchCourses = async () => {
-      const res = await fetch("/api/courses");
-      if (res.ok) {
-        const data = await res.json();
-        setCourses(data);
+      const response = await getCourses();
+      if (response.success) {
+        setCourses(response.data);
       }
     };
     fetchCourses();
   }, []);
 
-  // Handle enrollment
   const handleEnroll = async () => {
-    if (!selectedCourseID || !studentID || !studentName || !semester || !section) {
+    if (
+      !selectedCourseID ||
+      !studentID ||
+      !studentName ||
+      !semester ||
+      !section
+    ) {
       setToastMessage("Please fill all fields before enrolling.");
       return;
     }
 
-    const selectedCourse = courses.find((course) => course.id === selectedCourseID);
-    if (selectedCourse && selectedCourse.enrolled >= selectedCourse.maxEnrollments) {
+    const selectedCourse = courses.find(
+      (course) => course.id === selectedCourseID
+    );
+    if (
+      selectedCourse &&
+      selectedCourse.enrolled >= selectedCourse.maxEnrollments
+    ) {
       setToastMessage("Enrollment limit reached for this course.");
       return;
     }
 
-    const response = await fetch("/api/enroll-student", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ courseID: selectedCourseID, studentID, studentName, semester, section }),
+    const response = await enrollStudent({
+      courseID: selectedCourseID,
+      studentID,
+      studentName,
+      semester,
+      section,
     });
 
-    if (response.ok) {
+    if (response.success) {
       setToastMessage("Student enrolled successfully!");
       setCourses((prev) =>
         prev.map((course) =>
-          course.id === selectedCourseID ? { ...course, enrolled: course.enrolled + 1 } : course
+          course.id === selectedCourseID
+            ? { ...course, enrolled: course.enrolled + 1 }
+            : course
         )
       );
-      setStudentID("");
-      setStudentName("");
-      setSemester("");
-      setSection("");
     } else {
       setToastMessage("Failed to enroll student. Please try again.");
     }
@@ -71,7 +89,11 @@ export default function EnrollStudentsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       {/* Back Button */}
-      <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2 mb-6 w-fit ml-auto">
+      <Button
+        variant="outline"
+        onClick={() => router.back()}
+        className="flex items-center gap-2 mb-6 w-fit ml-auto"
+      >
         <ArrowLeft size={16} /> Back
       </Button>
 
@@ -85,7 +107,10 @@ export default function EnrollStudentsPage() {
           {/* Course Selection */}
           <div className="mb-4">
             <Label>Select Course</Label>
-            <Select value={selectedCourseID} onValueChange={setSelectedCourseID}>
+            <Select
+              value={selectedCourseID}
+              onValueChange={setSelectedCourseID}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a course" />
               </SelectTrigger>
@@ -93,7 +118,8 @@ export default function EnrollStudentsPage() {
                 <SelectContent className="z-50 bg-white shadow-lg rounded-md p-2">
                   {courses.map((course) => (
                     <SelectItem key={course.id} value={course.id}>
-                      {course.name} (Enrolled: {course.enrolled}/{course.maxEnrollments})
+                      {course.name} (Enrolled: {course.enrolled}/
+                      {course.maxEnrollments})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -105,11 +131,21 @@ export default function EnrollStudentsPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="studentID">Student ID</Label>
-              <Input id="studentID" value={studentID} onChange={(e) => setStudentID(e.target.value)} required />
+              <Input
+                id="studentID"
+                value={studentID}
+                onChange={(e) => setStudentID(e.target.value)}
+                required
+              />
             </div>
             <div>
               <Label htmlFor="studentName">Student Name</Label>
-              <Input id="studentName" value={studentName} onChange={(e) => setStudentName(e.target.value)} required />
+              <Input
+                id="studentName"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                required
+              />
             </div>
           </div>
 
@@ -122,11 +158,13 @@ export default function EnrollStudentsPage() {
               </SelectTrigger>
               <SelectPortal>
                 <SelectContent className="z-50 bg-white shadow-lg rounded-md p-2">
-                  {["I", "II", "III", "IV", "V", "VI", "VII", "VIII"].map((sem) => (
-                    <SelectItem key={sem} value={sem}>
-                      Semester {sem}
-                    </SelectItem>
-                  ))}
+                  {["I", "II", "III", "IV", "V", "VI", "VII", "VIII"].map(
+                    (sem) => (
+                      <SelectItem key={sem} value={sem}>
+                        Semester {sem}
+                      </SelectItem>
+                    )
+                  )}
                 </SelectContent>
               </SelectPortal>
             </Select>
@@ -161,7 +199,9 @@ export default function EnrollStudentsPage() {
       </div>
 
       {/* Toast Message */}
-      {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage("")} />}
+      {toastMessage && (
+        <Toast message={toastMessage} onClose={() => setToastMessage("")} />
+      )}
     </div>
   );
 }

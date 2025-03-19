@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import secureLocalStorage from "react-secure-storage";
+import { getStudentCourses } from "@/app/_utils/api";
 
 ChartJS.register(
   CategoryScale,
@@ -32,7 +33,6 @@ export default function StudentDashboard() {
   const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
   const [attendanceData, setAttendanceData] = useState<any>(null);
 
-  // Sample data for testing
   const sampleCourses = [
     { courseCode: "CS101", courseName: "Data Structures" },
     { courseCode: "CS102", courseName: "Operating Systems" },
@@ -43,32 +43,16 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      try {
-        const token = secureLocalStorage.getItem("jwtToken");
-        if (!token) {
-          alert("No token found. Please log in.");
-          router.push("/login");
-          return;
-        }
+      const token = secureLocalStorage.getItem("jwtToken");
+      if (!token) {
+        alert("No token found. Please log in.");
+        router.push("/login");
+        return;
+      }
 
-        const response = await fetch(
-          "http://localhost:8080/api/student/getCourses",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch courses");
-        }
-
-        const data = await response.json();
-        console.log("Fetched courses:", data);
-        if (data.length === 0) {
+      const response = await getStudentCourses(token);
+      if (response.success) {
+        if (response.data.length === 0) {
           setEnrolledCourses(sampleCourses);
           setAttendanceData({
             labels: sampleCourses.map((course) => course.courseCode),
@@ -81,10 +65,14 @@ export default function StudentDashboard() {
             ],
           });
         } else {
-          setEnrolledCourses(data);
-          const attendance = data.map(() => Math.floor(Math.random() * 100));
+          setEnrolledCourses(response.data);
+          const attendance = response.data.map(() =>
+            Math.floor(Math.random() * 100)
+          );
           setAttendanceData({
-            labels: data.map((course: any) => course.courseCode || "No Code"),
+            labels: response.data.map(
+              (course: any) => course.courseCode || "No Code"
+            ),
             datasets: [
               {
                 label: "Attendance (%) is less than 75%",
@@ -100,8 +88,8 @@ export default function StudentDashboard() {
             ],
           });
         }
-      } catch (error) {
-        console.error("Error fetching courses:", error);
+      } else {
+        console.error("Error fetching courses:", response.message);
         alert("Failed to load enrolled courses. Please try again.");
       }
     };

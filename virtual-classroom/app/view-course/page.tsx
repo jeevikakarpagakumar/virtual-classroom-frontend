@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, ArrowLeft, ChevronUp, ChevronRight } from "lucide-react";
 import secureLocalStorage from "react-secure-storage";
+import { getStudentCourses } from "@/app/_utils/api";
 
 interface Course {
   classroomID: number;
@@ -20,7 +21,7 @@ interface Course {
   courseName: string;
   facultyID: number;
   facultyName: string;
-  courseDescription: string; // Added description field
+  courseDescription: string;
 }
 
 export default function ViewCourses() {
@@ -31,33 +32,18 @@ export default function ViewCourses() {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      try {
-        const token = secureLocalStorage.getItem("jwtToken");
-        if (!token) {
-          alert("No token found. Please log in.");
-          router.push("/login");
-          return;
-        }
+      const token = secureLocalStorage.getItem("jwtToken");
+      if (!token) {
+        alert("No token found. Please log in.");
+        router.push("/login");
+        return;
+      }
 
-        const response = await fetch(
-          "http://localhost:8080/api/student/getCourses",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch courses");
-        }
-
-        const data = await response.json();
-        setCourses(data);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
+      const response = await getStudentCourses(token);
+      if (response.success) {
+        setCourses(response.data);
+      } else {
+        console.error("Error fetching courses:", response.message);
         alert("Failed to load courses. Please try again.");
       }
     };
