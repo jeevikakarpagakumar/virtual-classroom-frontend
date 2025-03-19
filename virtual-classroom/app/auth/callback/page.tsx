@@ -32,19 +32,13 @@ export default function AuthCallback() {
         } else if (userRole === "Admin") {
           URL = BASE_URL + "/Aauth";
         } else if (userRole === "Faculty") {
-          console.log("Ommalaa");
           URL = BASE_URL + "/Fauth"
-        } else {
-          URL = BASE_URL + "/studentAuth"; // need to change to faculty
         }
 
-        console.log("URL", URL);
         const response = await fetch(
           `${URL}/google/callback?state=${state}&code=${code}`
         );
         const data = await response.json();
-
-        console.log(data);
 
         if (response.status === 200) {
           secureLocalStorage.setItem("jwtToken", data.jwtToken);
