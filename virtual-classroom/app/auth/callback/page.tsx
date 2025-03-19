@@ -26,10 +26,14 @@ export default function AuthCallback() {
         const userRole = secureLocalStorage.getItem("userRole");
         let URL = "";
 
+
         if (userRole === "Student") {
           URL = BASE_URL + "/studentAuth";
         } else if (userRole === "Admin") {
           URL = BASE_URL + "/Aauth";
+        } else if (userRole === "Faculty") {
+          console.log("Ommalaa");
+          URL = BASE_URL + "/Fauth"
         } else {
           URL = BASE_URL + "/studentAuth"; // need to change to faculty
         }
@@ -40,6 +44,8 @@ export default function AuthCallback() {
         );
         const data = await response.json();
 
+        console.log(data);
+
         if (response.status === 200) {
           secureLocalStorage.setItem("jwtToken", data.jwtToken);
           secureLocalStorage.setItem("userRole", data.userRole);
@@ -47,8 +53,8 @@ export default function AuthCallback() {
             router.push("/admin");
           } else if (data.userRole === "Student") {
             router.push("/student");
-          } else {
-            router.push("/teacher");
+          } else if(data.userRole === "Faculty") {
+            router.push("/faculty");
           }
         } else {
           setErrorMessage(
