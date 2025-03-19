@@ -101,3 +101,8 @@ export const getCourses = async () => {
 export const enrollStudent = async (studentData) => {
   return makeRequest("/enroll-student", "POST", studentData);
 };
+
+
+export const assignFaculty = async (facultyAssignmentData, token) => {
+  return makeRequest("/admin/assignFaculty", "POST", facultyAssignmentData, token);
+};
