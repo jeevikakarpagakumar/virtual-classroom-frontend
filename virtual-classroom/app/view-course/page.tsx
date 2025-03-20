@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, ArrowLeft, ChevronUp, ChevronRight } from "lucide-react";
 import secureLocalStorage from "react-secure-storage";
-import { getStudentCourses } from "@/app/_utils/api";
+import { getStudentCourses, getMeetingLink } from "@/app/_utils/api";
 
 interface Course {
   classroomID: number;
@@ -51,19 +51,20 @@ export default function ViewCourses() {
     fetchCourses();
   }, [router]);
 
-  const sortCourses = (option: string) => {
-    const sortedCourses = [...courses];
-    if (option === "A-Z") {
-      sortedCourses.sort((a, b) => a.courseName.localeCompare(b.courseName));
-    } else if (option === "Z-A") {
-      sortedCourses.sort((a, b) => b.courseName.localeCompare(a.courseName));
+  const joinMeeting = async (selectedClassroomID) => {
+    const token = secureLocalStorage.getItem("jwtToken");
+    if (!token) {
+      alert("Authentication error. Please log in again.");
+      router.push("/login");
+      return;
     }
-    setSortOption(option);
-    setCourses(sortedCourses);
-  };
 
-  const toggleExpand = (courseID: number) => {
-    setExpandedCourse(expandedCourse === courseID ? null : courseID);
+    const response = await getMeetingLink(selectedClassroomID, token);
+    if (response.success && response.data.meetingLink) {
+      window.location.href = response.data.meetingLink;
+    } else {
+      alert("No current meetings available.");
+    }
   };
 
   return (
@@ -72,34 +73,12 @@ export default function ViewCourses() {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
           Available Courses
         </h1>
-
         <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="flex items-center gap-2"
-          >
+          <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2">
             <ArrowLeft size={16} /> Back
           </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                Filter <ChevronDown size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => sortCourses("A-Z")}>
-                Sort A-Z
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => sortCourses("Z-A")}>
-                Sort Z-A
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.length > 0 ? (
           courses.map((course) => (
@@ -110,30 +89,21 @@ export default function ViewCourses() {
                     <h2 className="text-xl font-semibold">
                       {course.courseName} - {course.courseCode}
                     </h2>
-                    <p className="text-gray-600">
-                      Faculty: {course.facultyName}
-                    </p>
+                    <p className="text-gray-600">Faculty: {course.facultyName}</p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    onClick={() => toggleExpand(course.courseID)}
-                  >
-                    {expandedCourse === course.courseID ? (
-                      <ChevronUp size={20} />
-                    ) : (
-                      <ChevronRight size={20} />
-                    )}
+                  <Button variant="ghost" onClick={() => setExpandedCourse(expandedCourse === course.courseID ? null : course.courseID)}>
+                    {expandedCourse === course.courseID ? <ChevronUp size={20} /> : <ChevronRight size={20} />}
                   </Button>
                 </div>
-
                 {expandedCourse === course.courseID && (
                   <div className="mt-4 p-3 border-t border-gray-300">
-                    <h3 className="text-lg font-semibold mb-2">
-                      Course Description
-                    </h3>
+                    <h3 className="text-lg font-semibold mb-2">Course Description</h3>
                     <p className="text-gray-700">
                       {course.courseDescription || "No description available."}
                     </p>
+                    <Button className="mt-3" onClick={() => joinMeeting(course.classroomID)}>
+                      Join Meeting
+                    </Button>
                   </div>
                 )}
               </CardContent>

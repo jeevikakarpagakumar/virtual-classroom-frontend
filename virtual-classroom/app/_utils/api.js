@@ -82,11 +82,21 @@ export const getStudentProfile = async (token) => {
   return makeRequest("/student/profile", "GET", null, token);
 };
 
-export const getStudentCourses = async (emailID, token) => {
-  return makeRequest("/student/getCourses", "GET", { emailID }, token);
+export const getStudentCourses = async (token) => {
+  return makeRequest("/student/getCourses", "GET", null, token);
 };
 
 export const createMeeting = async (meetingData, token) => {
   return makeRequest("/faculty/createMeeting", "POST", meetingData, token);
 };
 
+// Function to fetch the meeting link
+export const getMeetingLink = async (classroomID, token) => {
+  const response = await makeRequest(
+    "/student/meeting",
+    "POST",
+    { classroomID },
+    token
+  );
+  return response;
+};
