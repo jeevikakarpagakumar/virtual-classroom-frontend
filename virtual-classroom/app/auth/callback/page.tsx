@@ -41,14 +41,16 @@ export default function AuthCallback() {
         const data = await response.json();
 
         if (response.status === 200) {
+          console.log(data);
           secureLocalStorage.setItem("jwtToken", data.jwtToken);
           secureLocalStorage.setItem("userRole", data.userRole);
+          secureLocalStorage.setItem("accessToken", data.accessToken);
           if (data.userRole === "Admin") {
             router.push("/admin");
           } else if (data.userRole === "Student") {
             router.push("/student");
           } else if(data.userRole === "Faculty") {
-            router.push("/faculty");
+            router.push("/teacher");
           }
         } else {
           setErrorMessage(

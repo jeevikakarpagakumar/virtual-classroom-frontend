@@ -82,27 +82,11 @@ export const getStudentProfile = async (token) => {
   return makeRequest("/student/profile", "GET", null, token);
 };
 
-export const getStudentCourses = async (token) => {
-  return makeRequest("/student/getCourses", "GET", null, token);
+export const getStudentCourses = async (emailID, token) => {
+  return makeRequest("/student/getCourses", "GET", { emailID }, token);
 };
 
-export const getQuizzes = async (classroomID) => {
-  return makeRequest(`/getQuiz?classroomID=${classroomID}`, "GET");
+export const createMeeting = async (meetingData, token) => {
+  return makeRequest("/faculty/createMeeting", "POST", meetingData, token);
 };
 
-export const getAssignments = async () => {
-  return makeRequest("/get-assignments", "GET");
-};
-
-export const getCourses = async () => {
-  return makeRequest("/courses", "GET");
-};
-
-export const enrollStudent = async (studentData) => {
-  return makeRequest("/enroll-student", "POST", studentData);
-};
-
-
-export const assignFaculty = async (facultyAssignmentData, token) => {
-  return makeRequest("/admin/assignFaculty", "POST", facultyAssignmentData, token);
-};

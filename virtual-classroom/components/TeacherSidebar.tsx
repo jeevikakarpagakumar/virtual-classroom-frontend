@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, ChevronLeft, ChevronRight, User, LogOut } from "lucide-react";
+import { Home, ChevronLeft, ChevronRight, User, LogOut, Video } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import secureLocalStorage from "react-secure-storage";
@@ -48,6 +48,12 @@ export default function TeacherSidebar() {
           className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
         >
           <Home className="w-5 h-5 mr-3" /> {isSidebarOpen && "Create Quiz"}
+        </Link>
+        <Link
+          href="/teacher/create-meet"
+          className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <Video className="w-5 h-5 mr-3" /> {isSidebarOpen && "Create Meeting"}
         </Link>
       </nav>
 
