@@ -11,8 +11,8 @@ import {
   ChevronRight,
   Book,
   UserPlus,
-  UserPenIcon,
   LogOut,
+  ClipboardList, // Icon for Assignments
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -64,8 +64,14 @@ export default function StudentSidebar() {
           href="/quiz-assignment"
           className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
         >
-          <Pencil className="w-5 h-5 mr-3" />{" "}
-          {isSidebarOpen && "Quiz & Assignment"}
+          <Pencil className="w-5 h-5 mr-3" /> {isSidebarOpen && "Quiz"}
+        </Link>
+        <Link
+          href="/student/assignment"
+          className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <ClipboardList className="w-5 h-5 mr-3" />{" "}
+          {isSidebarOpen && "Assignments"}
         </Link>
       </nav>
 
