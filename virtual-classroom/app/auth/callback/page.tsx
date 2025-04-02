@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import secureLocalStorage from "react-secure-storage";
 
-export default function AuthCallback() {
+// Inner component that uses useSearchParams
+function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState("");
@@ -24,34 +25,27 @@ export default function AuthCallback() {
       try {
         const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
         const userRole = secureLocalStorage.getItem("userRole");
+
         let URL = "";
-
-
-        if (userRole === "Student") {
-          URL = BASE_URL + "/studentAuth";
-        } else if (userRole === "Admin") {
-          URL = BASE_URL + "/Aauth";
-        } else if (userRole === "Faculty") {
-          URL = BASE_URL + "/Fauth"
-        }
+        if (userRole === "Student") URL = `${BASE_URL}/studentAuth`;
+        else if (userRole === "Admin") URL = `${BASE_URL}/Aauth`;
+        else if (userRole === "Faculty") URL = `${BASE_URL}/Fauth`;
 
         const response = await fetch(
           `${URL}/google/callback?state=${state}&code=${code}`
         );
         const data = await response.json();
 
+        console.log("Response from server:", data);
+
         if (response.status === 200) {
-          console.log(data);
           secureLocalStorage.setItem("jwtToken", data.jwtToken);
           secureLocalStorage.setItem("userRole", data.userRole);
           secureLocalStorage.setItem("accessToken", data.accessToken);
-          if (data.userRole === "Admin") {
-            router.push("/admin");
-          } else if (data.userRole === "Student") {
-            router.push("/student");
-          } else if(data.userRole === "Faculty") {
-            router.push("/teacher");
-          }
+
+          if (data.userRole === "Admin") router.push("/admin");
+          else if (data.userRole === "Student") router.push("/student");
+          else if (data.userRole === "Faculty") router.push("/teacher");
         } else {
           setErrorMessage(
             data.error || "Authentication failed. Please try again."
@@ -74,5 +68,20 @@ export default function AuthCallback() {
         <p className="text-gray-700">Processing authentication...</p>
       )}
     </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function AuthCallback() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <p className="text-gray-700">Loading authentication page...</p>
+        </div>
+      }
+    >
+      <CallbackContent />
+    </Suspense>
   );
 }
