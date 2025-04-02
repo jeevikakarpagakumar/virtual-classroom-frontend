@@ -1,6 +1,7 @@
 // components/ui/toast.tsx
 import { useState, useEffect } from "react";
-export type ToastActionElement = React.ReactElement
+import React from "react"; // Required for React.ReactNode/Element
+
 export function Toast({
   message,
   onClose,
@@ -33,3 +34,16 @@ export function Toast({
     )
   );
 }
+
+// ✅ Add missing exports for use-toast.ts compatibility
+
+export type ToastActionElement = React.ReactElement;
+
+export type ToastProps = {
+  id?: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
