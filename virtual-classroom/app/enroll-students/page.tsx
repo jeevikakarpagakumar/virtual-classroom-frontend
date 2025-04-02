@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { SelectPortal } from "@radix-ui/react-select";
 import { ArrowLeft, UserPlus } from "lucide-react";
-import { getCourses, enrollStudent } from "@/app/_utils/api";
+//import { getCourses, enrollStudent } from "@/app/_utils/api";
 
 export default function EnrollStudentsPage() {
   const router = useRouter();
