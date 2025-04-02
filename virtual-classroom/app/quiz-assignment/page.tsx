@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getQuizzes, getAssignments } from "@/app/_utils/api";
+//import { getQuizzes, getAssignments } from "@/app/_utils/api";
 
 interface Quiz {
   quizID: number;
