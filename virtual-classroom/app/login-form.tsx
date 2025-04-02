@@ -78,9 +78,24 @@ export function LoginForm({
                 value && setUserRole(value as "Student" | "Admin" | "Faculty")
               }
             >
-              <ToggleGroupItem value="Student">Student</ToggleGroupItem>
-              <ToggleGroupItem value="Admin">Admin</ToggleGroupItem>
-              <ToggleGroupItem value="Faculty">Faculty</ToggleGroupItem>
+              <ToggleGroupItem
+                value="Student"
+                data-state={userRole === "Student" ? "on" : "off"}
+              >
+                Student
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="Admin"
+                data-state={userRole === "Admin" ? "on" : "off"}
+              >
+                Admin
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="Faculty"
+                data-state={userRole === "Faculty" ? "on" : "off"}
+              >
+                Faculty
+              </ToggleGroupItem>
             </ToggleGroup>
           </div>
           <Button
