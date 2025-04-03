@@ -4,7 +4,8 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import secureLocalStorage from "react-secure-storage";
 
-function CallbackContent() {
+// Create a separate component that uses useSearchParams
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState("");
@@ -27,11 +28,11 @@ function CallbackContent() {
         let URL = "";
 
         if (userRole === "Student") {
-          URL = `${BASE_URL}/studentAuth`;
+          URL = BASE_URL + "/studentAuth";
         } else if (userRole === "Admin") {
-          URL = `${BASE_URL}/Aauth`;
+          URL = BASE_URL + "/Aauth";
         } else if (userRole === "Faculty") {
-          URL = `${BASE_URL}/Fauth`;
+          URL = BASE_URL + "/Fauth";
         }
 
         const response = await fetch(
@@ -44,7 +45,6 @@ function CallbackContent() {
           secureLocalStorage.setItem("jwtToken", data.jwtToken);
           secureLocalStorage.setItem("userRole", data.userRole);
           secureLocalStorage.setItem("accessToken", data.accessToken);
-
           if (data.userRole === "Admin") {
             router.push("/admin");
           } else if (data.userRole === "Student") {
@@ -77,16 +77,17 @@ function CallbackContent() {
   );
 }
 
+// Main component that wraps the content with Suspense
 export default function AuthCallback() {
   return (
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-screen">
-          <p className="text-gray-700">Loading authentication page...</p>
+          <p className="text-gray-700">Loading...</p>
         </div>
       }
     >
-      <CallbackContent />
+      <AuthCallbackContent />
     </Suspense>
   );
 }

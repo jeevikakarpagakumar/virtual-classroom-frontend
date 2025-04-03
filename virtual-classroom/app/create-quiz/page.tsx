@@ -25,18 +25,23 @@ export default function CreateQuizPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
 
     if (name === "startTime" || name === "endTime") {
       const start = new Date(name === "startTime" ? value : formData.startTime);
       const end = new Date(name === "endTime" ? value : formData.endTime);
       if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-        const duration = Math.round((end.getTime() - start.getTime()) / (1000 * 60)); // in minutes
+        const duration = Math.round(
+          (end.getTime() - start.getTime()) / (1000 * 60)
+        ); // in minutes
         setFormData((prev) => ({
           ...prev,
           quizDuration: duration > 0 ? duration.toString() : "",
@@ -51,14 +56,21 @@ export default function CreateQuizPage() {
     setQuestions(updated);
   };
 
-  const handleOptionChange = (qIndex: number, oIndex: number, value: string) => {
+  const handleOptionChange = (
+    qIndex: number,
+    oIndex: number,
+    value: string
+  ) => {
     const updated = [...questions];
     updated[qIndex].options[oIndex] = value;
     setQuestions(updated);
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { questionText: "", options: ["", "", "", ""] }]);
+    setQuestions([
+      ...questions,
+      { questionText: "", options: ["", "", "", ""] },
+    ]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,7 +108,11 @@ export default function CreateQuizPage() {
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="flex-1 flex justify-center items-center p-6 relative">
-        <Button type="button" onClick={() => router.back()} className="absolute top-4 right-4">
+        <Button
+          type="button"
+          onClick={() => router.back()}
+          className="absolute top-4 right-4"
+        >
           Back
         </Button>
         <Card className="w-full max-w-3xl p-6 shadow-lg border rounded-lg bg-white dark:bg-gray-800">
@@ -106,47 +122,93 @@ export default function CreateQuizPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label>Classroom ID</Label>
-              <Input name="classroomID" value={formData.classroomID} onChange={handleChange} required />
+              <Input
+                name="classroomID"
+                value={formData.classroomID}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div>
               <Label>Quiz Name</Label>
-              <Input name="quizName" value={formData.quizName} onChange={handleChange} required />
+              <Input
+                name="quizName"
+                value={formData.quizName}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div>
               <Label>Description</Label>
-              <Textarea name="quizDescription" value={formData.quizDescription} onChange={handleChange} required />
+              <Textarea
+                name="quizDescription"
+                value={formData.quizDescription}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Start Time</Label>
-                <Input type="datetime-local" name="startTime" value={formData.startTime} onChange={handleChange} required />
+                <Input
+                  type="datetime-local"
+                  name="startTime"
+                  value={formData.startTime}
+                  onChange={handleChange}
+                  required
+                />
               </div>
               <div>
                 <Label>End Time</Label>
-                <Input type="datetime-local" name="endTime" value={formData.endTime} onChange={handleChange} required />
+                <Input
+                  type="datetime-local"
+                  name="endTime"
+                  value={formData.endTime}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
             <div>
               <Label>Quiz Duration (minutes)</Label>
-              <Input name="quizDuration" value={formData.quizDuration} readOnly />
+              <Input
+                name="quizDuration"
+                value={formData.quizDuration}
+                readOnly
+              />
             </div>
             <div>
               <Label>Created By (Faculty ID)</Label>
-              <Input name="createdBy" value={formData.createdBy} onChange={handleChange} required />
+              <Input
+                name="createdBy"
+                value={formData.createdBy}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div className="flex items-center space-x-2">
-              <input type="checkbox" name="isOpenForAll" checked={formData.isOpenForAll} onChange={handleChange} />
+              <input
+                type="checkbox"
+                name="isOpenForAll"
+                checked={formData.isOpenForAll}
+                onChange={handleChange}
+              />
               <Label>Open for All Students</Label>
             </div>
 
             <div>
               <h3 className="font-semibold mt-6 mb-2 text-lg">Questions</h3>
               {questions.map((q, qIndex) => (
-                <div key={qIndex} className="mb-4 space-y-2 border p-4 rounded-md bg-gray-50">
+                <div
+                  key={qIndex}
+                  className="mb-4 space-y-2 border p-4 rounded-md bg-gray-50"
+                >
                   <Input
                     placeholder={`Question ${qIndex + 1}`}
                     value={q.questionText}
-                    onChange={(e) => handleQuestionChange(qIndex, e.target.value)}
+                    onChange={(e) =>
+                      handleQuestionChange(qIndex, e.target.value)
+                    }
                     required
                   />
                   {q.options.map((option, oIndex) => (
@@ -154,7 +216,9 @@ export default function CreateQuizPage() {
                       key={oIndex}
                       placeholder={`Option ${oIndex + 1}`}
                       value={option}
-                      onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                      onChange={(e) =>
+                        handleOptionChange(qIndex, oIndex, e.target.value)
+                      }
                       required
                     />
                   ))}
