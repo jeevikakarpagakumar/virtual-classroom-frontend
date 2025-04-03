@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import secureLocalStorage from "react-secure-storage";
 
-// Create a separate component that uses useSearchParams
-function AuthCallbackContent() {
+export default function AuthCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState("");
@@ -74,20 +73,5 @@ function AuthCallbackContent() {
         <p className="text-gray-700">Processing authentication...</p>
       )}
     </div>
-  );
-}
-
-// Main component that wraps the content with Suspense
-export default function AuthCallback() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-gray-700">Loading...</p>
-        </div>
-      }
-    >
-      <AuthCallbackContent />
-    </Suspense>
   );
 }
