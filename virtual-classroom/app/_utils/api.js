@@ -68,14 +68,7 @@ export const makeRequest = async (url, method, body = null, token = null) => {
 };
 
 export const registerCourse = async (courseData, token) => {
-  const response = await makeRequest(
-    "/admin/register-course",
-    "POST",
-    courseData,
-    token
-  );
-
-  return response;
+  return makeRequest("/admin/register-course", "POST", courseData, token);
 };
 
 export const getStudentProfile = async (token) => {
@@ -90,13 +83,25 @@ export const createMeeting = async (meetingData, token) => {
   return makeRequest("/faculty/createMeeting", "POST", meetingData, token);
 };
 
-// Function to fetch the meeting link
 export const getMeetingLink = async (classroomID, token) => {
-  const response = await makeRequest(
+  return makeRequest(
     `/student/meeting?classroomID=${classroomID}`,
     "GET",
     null,
     token
   );
-  return response;
+};
+
+export const createQuiz = async (quizData, token) => {
+  return makeRequest("/faculty/createQuiz", "POST", quizData, token);
+};
+
+// ✅ NEWLY ADDED for "Attempt Quiz" button
+export const getQuizLink = async (classroomID, token) => {
+  return makeRequest(
+    `/student/quiz?classroomID=${classroomID}`,
+    "GET",
+    null,
+    token
+  );
 };

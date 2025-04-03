@@ -4,15 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown, ArrowLeft, ChevronUp, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronRight } from "lucide-react";
 import secureLocalStorage from "react-secure-storage";
-import { getStudentCourses, getMeetingLink } from "@/app/_utils/api";
+import {
+  getStudentCourses,
+  getMeetingLink,
+  getQuizLink,
+} from "@/app/_utils/api"; // 👈 Import getQuizLink
 
 interface Course {
   classroomID: number;
@@ -27,7 +25,6 @@ interface Course {
 export default function ViewCourses() {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [sortOption, setSortOption] = useState<string>("A-Z");
   const [expandedCourse, setExpandedCourse] = useState<number | null>(null);
 
   useEffect(() => {
@@ -51,7 +48,7 @@ export default function ViewCourses() {
     fetchCourses();
   }, [router]);
 
-  const joinMeeting = async (selectedClassroomID) => {
+  const joinMeeting = async (classroomID: number) => {
     const token = secureLocalStorage.getItem("jwtToken");
     if (!token) {
       alert("Authentication error. Please log in again.");
@@ -59,11 +56,27 @@ export default function ViewCourses() {
       return;
     }
 
-    const response = await getMeetingLink(selectedClassroomID, token);
+    const response = await getMeetingLink(classroomID, token);
     if (response.success && response.data.meetingLink) {
       window.location.href = response.data.meetingLink;
     } else {
       alert("No current meetings available.");
+    }
+  };
+
+  const attemptQuiz = async (classroomID: number) => {
+    const token = secureLocalStorage.getItem("jwtToken");
+    if (!token) {
+      alert("Authentication error. Please log in again.");
+      router.push("/login");
+      return;
+    }
+
+    const response = await getQuizLink(classroomID, token);
+    if (response.success && response.data.quizLink) {
+      window.open(response.data.quizLink, "_blank");
+    } else {
+      alert("No active quiz available.");
     }
   };
 
@@ -73,12 +86,15 @@ export default function ViewCourses() {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
           Available Courses
         </h1>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2">
-            <ArrowLeft size={16} /> Back
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={() => router.back()}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft size={16} /> Back
+        </Button>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.length > 0 ? (
           courses.map((course) => (
@@ -89,21 +105,47 @@ export default function ViewCourses() {
                     <h2 className="text-xl font-semibold">
                       {course.courseName} - {course.courseCode}
                     </h2>
-                    <p className="text-gray-600">Faculty: {course.facultyName}</p>
+                    <p className="text-gray-600">
+                      Faculty: {course.facultyName}
+                    </p>
                   </div>
-                  <Button variant="ghost" onClick={() => setExpandedCourse(expandedCourse === course.courseID ? null : course.courseID)}>
-                    {expandedCourse === course.courseID ? <ChevronUp size={20} /> : <ChevronRight size={20} />}
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      setExpandedCourse(
+                        expandedCourse === course.courseID
+                          ? null
+                          : course.courseID
+                      )
+                    }
+                  >
+                    {expandedCourse === course.courseID ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronRight size={20} />
+                    )}
                   </Button>
                 </div>
+
                 {expandedCourse === course.courseID && (
                   <div className="mt-4 p-3 border-t border-gray-300">
-                    <h3 className="text-lg font-semibold mb-2">Course Description</h3>
-                    <p className="text-gray-700">
+                    <h3 className="text-lg font-semibold mb-2">
+                      Course Description
+                    </h3>
+                    <p className="text-gray-700 mb-3">
                       {course.courseDescription || "No description available."}
                     </p>
-                    <Button className="mt-3" onClick={() => joinMeeting(course.classroomID)}>
-                      Join Meeting
-                    </Button>
+                    <div className="flex gap-3">
+                      <Button onClick={() => joinMeeting(course.classroomID)}>
+                        Join Meeting
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => attemptQuiz(course.classroomID)}
+                      >
+                        Attempt Quiz
+                      </Button>
+                    </div>
                   </div>
                 )}
               </CardContent>

@@ -7,12 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import secureLocalStorage from "react-secure-storage";
 
 export default function CreateQuizPage() {
   const router = useRouter();
-  const [questions, setQuestions] = useState([
-    { questionText: "", options: ["", "", "", ""] },
-  ]);
   const [formData, setFormData] = useState({
     classroomID: "",
     quizName: "",
@@ -24,24 +22,21 @@ export default function CreateQuizPage() {
     isOpenForAll: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [formUrl, setFormUrl] = useState("");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target;
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
 
     if (name === "startTime" || name === "endTime") {
       const start = new Date(name === "startTime" ? value : formData.startTime);
       const end = new Date(name === "endTime" ? value : formData.endTime);
       if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-        const duration = Math.round(
-          (end.getTime() - start.getTime()) / (1000 * 60)
-        ); // in minutes
+        const duration = Math.round((end - start) / (1000 * 60));
         setFormData((prev) => ({
           ...prev,
           quizDuration: duration > 0 ? duration.toString() : "",
@@ -50,58 +45,79 @@ export default function CreateQuizPage() {
     }
   };
 
-  const handleQuestionChange = (index: number, value: string) => {
-    const updated = [...questions];
-    updated[index].questionText = value;
-    setQuestions(updated);
-  };
-
-  const handleOptionChange = (
-    qIndex: number,
-    oIndex: number,
-    value: string
-  ) => {
-    const updated = [...questions];
-    updated[qIndex].options[oIndex] = value;
-    setQuestions(updated);
-  };
-
-  const addQuestion = () => {
-    setQuestions([
-      ...questions,
-      { questionText: "", options: ["", "", "", ""] },
-    ]);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const payload = {
-      ...formData,
-      quizDuration: parseInt(formData.quizDuration),
-      questions,
-    };
+    const accessToken = secureLocalStorage.getItem("accessToken");
+    const jwtToken = secureLocalStorage.getItem("jwtToken");
+
+    if (!accessToken || !jwtToken) {
+      setToastMessage("Authentication token missing.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const res = await fetch("/api/create-google-form", {
+      // Step 1: Create Google Form
+      const formRes = await fetch("https://forms.googleapis.com/v1/forms", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          info: {
+            title: formData.quizName,
+            description: formData.quizDescription,
+          },
+        }),
       });
 
-      const data = await res.json();
-      setIsSubmitting(false);
-      if (res.ok) {
-        alert("Google Form created successfully!");
-        window.open(data.formUrl, "_blank");
-        router.push("/teacher-dashboard");
-      } else {
-        alert(data.error || "Failed to create quiz");
+      const formDataGoogle = await formRes.json();
+
+      if (!formRes.ok) {
+        throw new Error(
+          formDataGoogle.error?.message || "Failed to create Google Form."
+        );
       }
+
+      const formUrl = `https://docs.google.com/forms/d/${formDataGoogle.formId}/edit`;
+      setFormUrl(formUrl);
+
+      // Step 2: Send form metadata to backend
+      const payload = {
+        ...formData,
+        quizDuration: parseInt(formData.quizDuration),
+        quizData: formUrl,
+      };
+
+      const backendRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/faculty/createQuiz`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const backendData = await backendRes.json();
+
+      if (!backendRes.ok) {
+        throw new Error(backendData.error || "Failed to save quiz to backend.");
+      }
+
+      setToastMessage("Quiz created successfully!");
+      window.open(formUrl, "_blank");
+      router.push("/teacher-dashboard");
     } catch (error) {
+      console.error("Quiz creation error:", error);
+      setToastMessage(error.message || "Something went wrong.");
+    } finally {
       setIsSubmitting(false);
-      alert("Error submitting form. Please try again.");
     }
   };
 
@@ -115,126 +131,54 @@ export default function CreateQuizPage() {
         >
           Back
         </Button>
-        <Card className="w-full max-w-3xl p-6 shadow-lg border rounded-lg bg-white dark:bg-gray-800">
-          <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-white mb-6">
-            Create a Google Quiz
+        <Card className="w-full max-w-lg p-6 shadow-lg border rounded-lg bg-white dark:bg-gray-800">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6 text-center">
+            Create a New Quiz
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label>Classroom ID</Label>
-              <Input
-                name="classroomID"
-                value={formData.classroomID}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <Label>Quiz Name</Label>
-              <Input
-                name="quizName"
-                value={formData.quizName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Textarea
-                name="quizDescription"
-                value={formData.quizDescription}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Start Time</Label>
+            {Object.keys(formData).map((key) => (
+              <div key={key}>
+                <Label htmlFor={key}>
+                  {key.replace(/([A-Z])/g, " $1").trim()}
+                </Label>
                 <Input
-                  type="datetime-local"
-                  name="startTime"
-                  value={formData.startTime}
+                  id={key}
+                  name={key}
+                  type={key.includes("Time") ? "datetime-local" : "text"}
+                  value={formData[key]}
                   onChange={handleChange}
                   required
                 />
               </div>
-              <div>
-                <Label>End Time</Label>
-                <Input
-                  type="datetime-local"
-                  name="endTime"
-                  value={formData.endTime}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Quiz Duration (minutes)</Label>
-              <Input
-                name="quizDuration"
-                value={formData.quizDuration}
-                readOnly
-              />
-            </div>
-            <div>
-              <Label>Created By (Faculty ID)</Label>
-              <Input
-                name="createdBy"
-                value={formData.createdBy}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                name="isOpenForAll"
-                checked={formData.isOpenForAll}
-                onChange={handleChange}
-              />
-              <Label>Open for All Students</Label>
-            </div>
+            ))}
 
-            <div>
-              <h3 className="font-semibold mt-6 mb-2 text-lg">Questions</h3>
-              {questions.map((q, qIndex) => (
-                <div
-                  key={qIndex}
-                  className="mb-4 space-y-2 border p-4 rounded-md bg-gray-50"
-                >
-                  <Input
-                    placeholder={`Question ${qIndex + 1}`}
-                    value={q.questionText}
-                    onChange={(e) =>
-                      handleQuestionChange(qIndex, e.target.value)
-                    }
-                    required
-                  />
-                  {q.options.map((option, oIndex) => (
-                    <Input
-                      key={oIndex}
-                      placeholder={`Option ${oIndex + 1}`}
-                      value={option}
-                      onChange={(e) =>
-                        handleOptionChange(qIndex, oIndex, e.target.value)
-                      }
-                      required
-                    />
-                  ))}
-                </div>
-              ))}
-              <Button type="button" onClick={addQuestion} className="mt-2">
-                Add Another Question
+            <div className="flex justify-between">
+              <Button type="submit" disabled={isSubmitting} className="w-full">
+                {isSubmitting ? "Creating Quiz..." : "Create Quiz"}
               </Button>
             </div>
-
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? "Creating Google Form..." : "Create Quiz"}
-            </Button>
           </form>
+
+          {formUrl && (
+            <div className="mt-4 p-3 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-md text-center">
+              <p>Google Form Link:</p>
+              <a
+                href={formUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                {formUrl}
+              </a>
+            </div>
+          )}
         </Card>
       </div>
+      {toastMessage && (
+        <div className="fixed bottom-4 right-4 bg-gray-800 text-white p-4 rounded-md">
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }
