@@ -26,13 +26,12 @@ export default function AuthCallback() {
         const userRole = secureLocalStorage.getItem("userRole");
         let URL = "";
 
-
         if (userRole === "Student") {
           URL = BASE_URL + "/studentAuth";
         } else if (userRole === "Admin") {
           URL = BASE_URL + "/Aauth";
         } else if (userRole === "Faculty") {
-          URL = BASE_URL + "/Fauth"
+          URL = BASE_URL + "/Fauth";
         }
 
         const response = await fetch(
@@ -49,7 +48,7 @@ export default function AuthCallback() {
             router.push("/admin");
           } else if (data.userRole === "Student") {
             router.push("/student");
-          } else if(data.userRole === "Faculty") {
+          } else if (data.userRole === "Faculty") {
             router.push("/teacher");
           }
         } else {

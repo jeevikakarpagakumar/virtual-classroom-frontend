@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { SelectPortal } from "@radix-ui/react-select";
 import { ArrowLeft, UserPlus } from "lucide-react";
-import { getCourses, enrollStudent } from "@/app/_utils/api";
+//import { getCourses, enrollStudent } from "@/app/_utils/api";
 
 export default function EnrollStudentsPage() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function EnrollStudentsPage() {
   const [toastMessage, setToastMessage] = useState("");
 
   // Fetch courses with their enrollment limits
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchCourses = async () => {
       const response = await getCourses();
       if (response.success) {
@@ -39,7 +39,7 @@ export default function EnrollStudentsPage() {
       }
     };
     fetchCourses();
-  }, []);
+  }, []);*/
 
   const handleEnroll = async () => {
     if (
@@ -64,7 +64,7 @@ export default function EnrollStudentsPage() {
       return;
     }
 
-    const response = await enrollStudent({
+    /*const response = await enrollStudent({
       courseID: selectedCourseID,
       studentID,
       studentName,
@@ -84,7 +84,7 @@ export default function EnrollStudentsPage() {
     } else {
       setToastMessage("Failed to enroll student. Please try again.");
     }
-  };
+  };*/
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
@@ -204,4 +204,5 @@ export default function EnrollStudentsPage() {
       )}
     </div>
   );
+}
 }

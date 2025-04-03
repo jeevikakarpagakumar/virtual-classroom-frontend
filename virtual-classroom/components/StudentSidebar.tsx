@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import secureLocalStorage from "react-secure-storage";
+import Image from "next/image";
 
 export default function StudentSidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -46,8 +47,24 @@ export default function StudentSidebar() {
         )}
       </Button>
 
+      {/* Avatar Section */}
+      <div className="flex flex-col items-center mt-6">
+        <Link href="/student/account">
+          <Image
+            src="https://avatar.iran.liara.run/public"
+            alt="Student Avatar"
+            width={50}
+            height={50}
+            className="rounded-full cursor-pointer border-2 border-gray-300 dark:border-gray-600"
+          />
+        </Link>
+        {isSidebarOpen && (
+          <p className="mt-2 text-gray-700 dark:text-gray-300">Student</p>
+        )}
+      </div>
+
       {/* Sidebar Navigation */}
-      <nav className="p-4 space-y-4 mt-10 flex-grow">
+      <nav className="p-4 space-y-4 mt-6 flex-grow">
         <Link
           href="/student"
           className="flex items-center p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"

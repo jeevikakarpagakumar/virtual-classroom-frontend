@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { getQuizzes, getAssignments } from "@/app/_utils/api";
+//import { getQuizzes, getAssignments } from "@/app/_utils/api";
 
 interface Quiz {
   quizID: number;
@@ -31,13 +31,13 @@ export default function QuizAssignmentPage() {
     const fetchQuizzes = async () => {
       try {
         const classroomID = 1; // Change this based on your app logic
-        const response = await getQuizzes(classroomID); // Fixed API call
+        //const response = await getQuizzes(classroomID); // Fixed API call
 
-        if (response?.success) {
+        /*if (response?.success) {
           setQuizzes(response.data);
         } else {
           throw new Error(response?.message || "Failed to fetch quizzes");
-        }
+        }*/
       } catch (error) {
         console.error("Error fetching quizzes:", error);
       }
@@ -45,12 +45,12 @@ export default function QuizAssignmentPage() {
 
     const fetchAssignments = async () => {
       try {
-        const response = await getAssignments();
+        /*const response = await getAssignments();
         if (response?.success) {
           setAssignments(response.data);
         } else {
           throw new Error(response?.message || "Failed to fetch assignments");
-        }
+        }*/
       } catch (error) {
         console.error("Error fetching assignments:", error);
       }

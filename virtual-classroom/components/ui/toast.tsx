@@ -1,5 +1,6 @@
 // components/ui/toast.tsx
 import { useState, useEffect } from "react";
+export type ToastActionElement = React.ReactElement
 
 export function Toast({
   message,
