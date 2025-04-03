@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: theme("colors.background"); /* Light Mode */
+  color: theme("colors.foreground"); /* Text */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+/* Root Layout Styling */
+.body-container {
+  @apply bg-gray-100 min-h-screen flex flex-col;
+}
+
+/* Main Content Styling */
+main {
+  @apply flex-1;
+}
+
+.dark body {
+  background-color: theme("colors.dark-background"); /* Dark Mode */
+  color: theme("colors.dark-foreground");
+}
+
+/* Home Page Styling */
+.home-container {
+  @apply flex flex-col items-center justify-center min-h-screen bg-white;
+}
+
+.main-title {
+  @apply text-4xl text-blue-600 mb-6;
+}
+
+.description {
+  @apply text-lg text-gray-700 text-center max-w-2xl mb-6;
+}
+
+/* Root Layout Styling */
+.body-container {
+  @apply bg-gray-100;
+}
+
+/* Header Styling */
+.header {
+  @apply bg-red-600 text-white py-5 text-center;
+}
+
+.header-title {
+  @apply text-2xl font-bold;
+}
+
+/* Footer Styling */
+.footer {
+  @apply bg-gray-800 text-white text-center py-2;
+}
+
+.footer p {
+  @apply text-sm;
+}
+
+[data-state="on"] {
+  background-color: rgb(220, 38, 38);
+  color: white;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,12 +10,12 @@ import { Card } from "@/components/ui/card";
 import { Toast } from "@/components/ui/toast";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { SelectPortal } from "@radix-ui/react-select";
-import { createMeeting, getStudentCourses } from "@/app/_utils/api"; // Import API function
+import { createMeeting } from "@/app/_utils/api"; // Import API function
 import secureLocalStorage from "react-secure-storage";
 
 export default function CreateMeetingPage() {
   const router = useRouter();
-  const [courses, setCourses] = useState<any[]>([]);
+
   const [course, setCourse] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -25,34 +25,12 @@ export default function CreateMeetingPage() {
   const [meetingLink, setMeetingLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      const token = secureLocalStorage.getItem("jwtToken");
-      if (!token) {
-        alert("No token found. Please log in.");
-        router.push("/login");
-        return;
-      }
-
-      const response = await getStudentCourses(token);
-      if (response.success && response.data.length > 0) {
-        setCourses(response.data);
-        setCourse(response.data[0].courseCode); // Set default course
-      } else {
-        console.error("Error fetching courses:", response.message);
-        alert("Failed to load courses. Please try again.");
-      }
-    };
-
-    fetchCourses();
-  }, [router]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const token = secureLocalStorage.getItem("jwtToken");
-    const accessToken = secureLocalStorage.getItem("accessToken");
+    const token = secureLocalStorage.getItem("jwtToken"); // Get authentication token
+    const accessToken = secureLocalStorage.getItem("accessToken"); // Get Google API token
 
     if (!accessToken) {
       setIsSubmitting(false);
@@ -62,7 +40,7 @@ export default function CreateMeetingPage() {
 
     const meetingData = {
       classroomID: parseInt(classroomId),
-      emailID: "faculty@example.com", 
+      emailID: "faculty@example.com", // Replace with dynamic faculty email
       startTime: new Date(startTime).toISOString(),
       endTime: new Date(endTime).toISOString(),
       meetingDescription: description,
@@ -74,14 +52,15 @@ export default function CreateMeetingPage() {
       setIsSubmitting(false);
 
       if (response.success) {
-        setMeetingLink(response.data.meetingLink);
+        setMeetingLink(response.data.meetingLink); // Store generated meeting link
         setToastMessage(`Meeting Created Successfully!`);
-        setCourse(courses.length > 0 ? courses[0].courseCode : "");
+        setCourse("");
         setStartTime("");
         setEndTime("");
         setClassroomId("");
         setDescription("");
 
+        // Automatically copy the meeting link to clipboard
         navigator.clipboard.writeText(response.data.meetingLink);
       } else {
         setToastMessage(response.message || "Failed to create meeting. Please try again.");
@@ -103,6 +82,7 @@ export default function CreateMeetingPage() {
             Create a New Meeting
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Course Selection */}
             <div className="relative">
               <Label htmlFor="course">Select Course</Label>
               <Select value={course} onValueChange={setCourse}>
@@ -111,20 +91,17 @@ export default function CreateMeetingPage() {
                 </SelectTrigger>
                 <SelectPortal>
                   <SelectContent className="z-50 bg-white shadow-lg rounded-md p-2">
-                    {courses.length > 0 ? (
-                      courses.map((course: any) => (
-                        <SelectItem key={course.courseCode} value={course.courseCode}>
-                          {course.courseCode} - {course.courseName}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="default" disabled>No courses available</SelectItem>
-                    )}
+                    <SelectItem value="CSE101">CSE101 - Data Structures</SelectItem>
+                    <SelectItem value="CYS102">CYS102 - Cyber Security</SelectItem>
+                    <SelectItem value="AI103">AI103 - Machine Learning</SelectItem>
+                    <SelectItem value="ECE104">ECE104 - Embedded Systems</SelectItem>
+                    <SelectItem value="EEE105">EEE105 - Power Electronics</SelectItem>
                   </SelectContent>
                 </SelectPortal>
               </Select>
             </div>
 
+            {/* Start Time */}
             <div>
               <Label htmlFor="startTime">Start Time</Label>
               <Input
@@ -136,6 +113,7 @@ export default function CreateMeetingPage() {
               />
             </div>
 
+            {/* End Time */}
             <div>
               <Label htmlFor="endTime">End Time</Label>
               <Input
@@ -147,6 +125,7 @@ export default function CreateMeetingPage() {
               />
             </div>
 
+            {/* Classroom ID */}
             <div>
               <Label htmlFor="classroomId">Classroom ID</Label>
               <Input
@@ -158,6 +137,7 @@ export default function CreateMeetingPage() {
               />
             </div>
 
+            {/* Description (Optional) */}
             <div>
               <Label htmlFor="description">Description (Optional)</Label>
               <Textarea
@@ -168,6 +148,7 @@ export default function CreateMeetingPage() {
               />
             </div>
 
+            {/* Submit & Cancel Buttons */}
             <div className="flex justify-between">
               <Button type="submit" disabled={isSubmitting} className="w-[48%]">
                 {isSubmitting ? "Creating..." : "Create Meeting"}
@@ -178,6 +159,7 @@ export default function CreateMeetingPage() {
             </div>
           </form>
 
+          {/* Meeting Link Display */}
           {meetingLink && (
             <div className="mt-4 p-3 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-md text-center">
               <p>Meeting Link:</p>
@@ -188,6 +170,8 @@ export default function CreateMeetingPage() {
           )}
         </Card>
       </div>
+
+      {/* Toast Message */}
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage("")} />}
     </div>
   );
