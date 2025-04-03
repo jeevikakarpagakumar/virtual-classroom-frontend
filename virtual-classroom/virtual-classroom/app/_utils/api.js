@@ -93,9 +93,9 @@ export const createMeeting = async (meetingData, token) => {
 // Function to fetch the meeting link
 export const getMeetingLink = async (classroomID, token) => {
   const response = await makeRequest(
-    `/student/meeting?classroomID=${classroomID}`,
-    "GET",
-    null,
+    "/student/meeting",
+    "POST",
+    { classroomID },
     token
   );
   return response;
