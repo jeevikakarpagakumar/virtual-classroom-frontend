@@ -100,7 +100,7 @@ export default function QuizAssignmentPage() {
       </div>
 
       {/* Assignment Section */}
-      <div>
+      {/* <div>
         <h2 className="text-2xl font-bold mb-4">Assignments</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {assignments.length > 0 ? (
@@ -127,7 +127,7 @@ export default function QuizAssignmentPage() {
             <p className="text-gray-500">No assignments available.</p>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
